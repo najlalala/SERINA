@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About SERINA - Speech Emotion Recognition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* SERINA Color Palette */
+      --primary: #6C8EBF;       /* Soft Blue */
+      --secondary: #B6D7A8;     /* Mint Green */
+      --accent: #5D8A66;        /* Darker Mint */
+      --background: #F8FAFC;    /* Light Gray */
+      --surface: #FFFFFF;       /* White */
+      --text-primary: #2D3748;  /* Dark Gray */
+      --text-secondary: #4A5568;/* Medium Gray */
+      --error: #F56565;         /* Red for alerts */
+      --success: #48BB78;       /* Green for success */
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-top: 80px;
+    }
+
+    nav {
+      background: var(--primary);
+      padding: 1rem 2rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--surface);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .logo-icon img {
+      height: 2.5rem;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .logo-text {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.3rem;
+      color: var(--surface);
+      margin-left: -4px; /* atau -6px tergantung kebutuhan */
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--surface);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+
+    /* Hero Section */
+    .about-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      margin-bottom: 4rem;
+    }
+
+    .about-hero-content h1 {
+      font-size: 2.5rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .about-hero-content p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      text-align: justify;
+    }
+
+    .about-hero-image {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+   /* Tambahkan di bagian CSS yang sudah ada */
+    /* Tambahkan CSS ini */
+    .about-hero-image {
+        position: relative;
+    }
+
+    .hero-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .hero-img.active {
+        opacity: 1;
+    }
+
+    /* Section Styling */
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--secondary);
+      display: inline-block;
+    }
+
+    /* Interactive Methodology Section */
+    .methodology-container {
+      position: relative;
+      margin-bottom: 3rem;
+    }
+
+    .methodology-scroller {
+      display: flex;
+      gap: 2rem;
+      padding: 1rem 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none; /* Hide scrollbar for Firefox */
+      -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+    }
+
+    .methodology-scroller::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome/Safari */
+    }
+
+    .method-card {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--secondary);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      min-width: 300px;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .method-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .method-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(108, 142, 191, 0.1), transparent);
+      transition: left 0.7s;
+    }
+
+    .method-card:hover::after {
+      left: 100%;
+    }
+
+    .method-card h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .method-card p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+
+    .scroll-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: var(--surface);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .scroll-arrow:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .scroll-left {
+      left: -20px;
+    }
+
+    .scroll-right {
+      right: -20px;
+    }
+
+    /* Combined Emotion & Language Section */
+    .features-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .features-section {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .features-title {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .feature-item {
+      background: rgba(108, 142, 191, 0.1);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      background: var(--secondary);
+      transform: translateY(-3px);
+    }
+
+    .feature-item h4 {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .project-image {
+  width: 100%;
+  height: 200px;
+  background: var(--primary);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--surface);
+  font-size: 3rem;
+  position: relative;
+}
+
+.project-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3); /* Dark overlay for better text contrast */
+}
+
+.project-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--secondary);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.project-link:hover {
+  background: var(--accent);
+  color: var(--surface);
+  transform: translateY(-2px);
+}
+    .emotion-section {
+  background: var(--surface);
+  border: 1px solid rgba(108, 142, 191, 0.1);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.emotion-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tag {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.language-support {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed rgba(108, 142, 191, 0.2);
+}
+
+
+.use-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.use-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(108, 142, 191, 0.1);
+}
+
+.use-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(108, 142, 191, 0.2);
+}
+
+.use-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  background-size: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.psychology {
+  background-color: rgba(72, 187, 120, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2348BB78'%3E%3Cpath d='M12 2a10 10 0 0 0-9.95 9h11.64L9.74 7.05a1 1 0 0 1 1.41-1.41l5.66 5.65a1 1 0 0 1 0 1.42l-5.66 5.65a1 1 0 0 1-1.41 0 1 1 0 0 1 0-1.41L13.69 13H2.05A10 10 0 1 0 12 2Z'/%3E%3C/svg%3E");
+}
+
+.callcenter {
+  background-color: rgba(108, 142, 191, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236C8EBF'%3E%3Cpath d='M20 15.5a1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 17 7a1.5 1.5 0 0 1 1.5 1.5v7.5Zm-4 0a1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 13 7a1.5 1.5 0 0 1 1.5 1.5v7.5Zm-4 0a1.5 1.5 0 0 1-1.5 1.5A1.5 1.5 0 0 1 9 15.5v-7A1.5 1.5 0 0 1 10.5 7a1.5 1.5 0 0 1 1.5 1.5v7.5Z'/%3E%3C/svg%3E");
+}
+
+.education {
+  background-color: rgba(237, 137, 54, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ED8936'%3E%3Cpath d='M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82Z'/%3E%3C/svg%3E");
+}
+
+.use-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.use-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .use-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Emotion colors */
+.happy { background: rgba(72, 187, 120, 0.1); color: #48BB78; }
+.sad { background: rgba(108, 142, 191, 0.1); color: #6C8EBF; }
+.neutral { background: rgba(74, 85, 104, 0.1); color: #4A5568; }
+.calm { background: rgba(93, 138, 102, 0.1); color: #5D8A66; }
+.angry { background: rgba(245, 101, 101, 0.1); color: #F56565; }
+.fear { background: rgba(155, 89, 182, 0.1); color: #9B59B6; }
+.disgust { background: rgba(93, 138, 102, 0.1); color: #5D8A66; }
+.surprise { background: rgba(237, 137, 54, 0.1); color: #ED8936; }
+
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .about-hero {
+        grid-template-columns: 1fr;
+      }
+
+    .about-hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.5s ease-in-out;
+    }
+      
+      .features-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 3rem auto;
+      }
+      
+      .about-hero-content h1 {
+        font-size: 2rem;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
+      
+      nav {
+        padding: 1rem;
+      }
+      
+      .nav-links {
+        gap: 1rem;
+      }
+      
+      .scroll-arrow {
+        display: none;
+      }
+      
+      .methodology-scroller {
+        gap: 1rem;
+      }
+      
+      .method-card {
+        min-width: 280px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .nav-links {
+        width: 100%;
+        justify-content: space-around;
+      }
+      
+      .about-hero-content h1 {
+        font-size: 1.8rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <span class="logo-icon">
+          <img src="/static/images/logo.png" alt="SERINA Logo" />
+        </span>
+        <span class="logo-text">SERINA</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/analyze">Analyze</a>
+        <a href="/aboutus">About Us</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="about-hero">
+      <div class="about-hero-content">
+        <h1>Speech Emotion Recognition Interface & Analysis Technology</h1>
+        <p>is an AI-powered system that intelligently analyzes speech to detect emotional states in both Indonesian and English. Leveraging advanced deep learning models and real-time acoustic signal processing, SERINA transforms voice data into actionable emotional insights making human computer interaction more natural, responsive, and emotionally aware.<p>
+      </div>
+     <!-- Ganti div about-hero-image menjadi: -->
+<div class="about-hero-image">
+  <img class="hero-img active" src="/static/images/about.jpg" alt="Voice analysis technology">
+  <img class="hero-img" src="/static/images/about.jpg" alt="Voice analysis technology">
+</div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section class="section">
+      <h2 class="section-title">Methodology</h2>
+      <div class="methodology-container">
+        <div class="methodology-scroller">
+          <div class="method-card">
+            <h3>Data Augmentation</h3>
+            <p>Applied noise reduction, time-stretching, and pitch shifting to enhance training data</p>
+          </div>
+          <div class="method-card">
+            <h3>Feature Extraction</h3>
+            <p>We use Mel Frequency Cepstral Coefficients (MFCC) to capture the characteristics of human voice perception, including spectral features that are crucial for emotion recognition.</p>
+          </div>
+          <div class="method-card">
+            <h3>Metrics Evaluation</h3>
+            <p>Model performance was evaluated using precision, recall, F1-score, and accuracy metrics.</p>
+          </div>
+          <div class="method-card">
+            <h3>Deep Learning Model</h3>
+            <p>SERINA use CNN to train diverse speech datasets to accurately classify multiple emotional states from voice patterns</p>
+          </div>
+          <div class="method-card">
+            <h3>Privacy Protection</h3>
+            <p>All audio processing happens locally, ensuring your voice data remains private and secure.</p>
+          </div>
+          <div class="method-card">
+            <h3>Audio Segmentation</h3>
+            <p>Audio was segmented to enable more precise and efficient analysis.</p>
+          </div>
+        </div>
+        <button class="scroll-arrow scroll-left" aria-label="Scroll left">❮</button>
+        <button class="scroll-arrow scroll-right" aria-label="Scroll right">❯</button>
+      </div>
+    </section>
+<!-- Emotion Detection Section -->
+<div class="emotion-section">
+  <h3 class="section-subtitle">Detected Emotion Classes</h3>
+  <div class="emotion-tags">
+    <span class="tag happy">Happy</span>
+    <span class="tag sad">Sad</span>
+    <span class="tag neutral">Neutral</span>
+    <span class="tag calm">Calm</span>
+    <span class="tag angry">Angry</span>
+    <span class="tag fear">Fear</span>
+    <span class="tag disgust">Disgust</span>
+    <span class="tag surprise">Surprise</span>
+  </div>
+  <div class="language-support">Supported Languages: English & Indonesian</div>
+</div>
+
+<!-- Simplified Use Cases Section -->
+<section class="section">
+  <h2 class="section-title">Implementation Areas</h2>
+  <div class="use-cards">
+    <!-- Psychology Card -->
+    <a href="https://www.ijcert.org/index.php/ijcert/article/view/978" target="_blank" class="use-card">
+      <div class="use-icon psychology"></div>
+      <h3>Mental Health</h3>
+      <p>Therapy session analysis and emotional assessment</p>
+    </a>
+    
+    <!-- Call Center Card -->
+    <a href="https://www.mdpi.com/1424-8220/22/14/5311" target="_blank" class="use-card">
+      <div class="use-icon callcenter"></div>
+      <h3>Call Centers</h3>
+      <p>Customer service quality monitoring</p>
+    </a>
+    
+    <!-- Education Card -->
+    <a href="https://bcpublication.org/index.php/EP/article/view/2691" target="_blank" class="use-card">
+      <div class="use-icon education"></div>
+      <h3>Education</h3>
+      <p>Student engagement tracking</p>
+    </a>
+  </div>
+</section>
+
+  <script>
+    
+    // Methodology scroller functionality
+    const scroller = document.querySelector('.methodology-scroller');
+    const scrollLeftBtn = document.querySelector('.scroll-left');
+    const scrollRightBtn = document.querySelector('.scroll-right');
+    
+    scrollLeftBtn.addEventListener('click', () => {
+      scroller.scrollBy({ left: -300, behavior: 'smooth' });
+    });
+    
+    scrollRightBtn.addEventListener('click', () => {
+      scroller.scrollBy({ left: 300, behavior: 'smooth' });
+    });
+    
+    // Show/hide arrows based on scroll position
+    scroller.addEventListener('scroll', () => {
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      scrollLeftBtn.style.display = scroller.scrollLeft > 0 ? 'flex' : 'none';
+      scrollRightBtn.style.display = scroller.scrollLeft < maxScroll - 10 ? 'flex' : 'none';
+    });
+    
+    // Initialize arrows
+    scroller.dispatchEvent(new Event('scroll'));
+
+
+const images = [
+    '/static/images/about.jpg',
+    '/static/images/about2.jpg',
+    '/static/images/about3.jpg'
+    // Tambahkan gambar lainnya
+];
+
+let currentImageIndex = 0;
+const heroImages = document.querySelectorAll('.hero-img');
+let activeImageIndex = 0;
+
+function changeImage() {
+    // Update index gambar
+    currentImageIndex = (currentImageIndex + 1) % images.length;
+    
+    // Toggle active image
+    const currentImg = heroImages[activeImageIndex];
+    const nextImg = heroImages[1 - activeImageIndex];
+    
+    // Set source gambar berikutnya
+    nextImg.src = images[currentImageIndex];
+    
+    // Tunggu sebentar agar gambar ter-load
+    setTimeout(() => {
+        currentImg.classList.remove('active');
+        nextImg.classList.add('active');
+        
+        // Toggle active index
+        activeImageIndex = 1 - activeImageIndex;
+    }, 50);
+}
+
+// Ubah gambar setiap 5 detik
+setInterval(changeImage, 3000);
+</script>
+  </script>
+</body>
+</html>

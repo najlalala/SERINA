@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Real-time Speech Emotion Recognition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #6C8EBF;       /* Soft Blue */
+      --secondary: #B6D7A8;     /* Mint Green */
+      --accent: #5D8A66;        /* Darker Mint */
+      --background: #F8FAFC;    /* Light Gray */
+      --surface: #FFFFFF;       /* White */
+      --text-primary: #2D3748;  /* Dark Gray */
+      --text-secondary: #4A5568;/* Medium Gray */
+      --error: #F56565;         /* Red for alerts */
+      --success: #48BB78;       /* Green for success */
+      
+      /* Additional variables */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif; /* Ini yang perlu diubah */
+    }
+
+     /* Additional variables 
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 100%; 
+
+      background-color: #e6fcf8;
+      /* padding: 0 20px; 
+      line-height: 1.6;
+    } */
+    body {
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-top: 80px;
+    }
+
+    nav {
+      background: var(--primary);
+      padding: 1rem 2rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--surface);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .logo-icon img {
+      height: 2.5rem;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .logo-text {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.3rem;
+      color: var(--surface);
+      margin-left: -4px; /* atau -6px tergantung kebutuhan */
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--surface);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+
+    .main {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: flex-start;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-header {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: 2rem;
+      /* font-weight: 600; */
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      margin-top: 100px;
+    }
+
+    .card-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Recording Section */
+    .record-section {
+      margin-bottom: 25px;
+    }
+    .record-box {
+      background: linear-gradient(135deg, var(--primary));
+      color: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 25px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .record-box h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .record-box p {
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+    /* Status Messages */
+    .status {
+      padding: 0.875rem 1rem;
+      border-radius: var(--radius-md);
+      margin: 1rem 0;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .status.info { 
+      background: rgba(108, 142, 191, 0.1);
+      color: var(--text-primary);
+      border: 1px solid var(--primary);
+    }
+
+    .status.error { 
+      background: rgba(245, 101, 101, 0.1);
+      color: var(--error);
+      border: 1px solid var(--error);
+    }
+
+    .status.success { 
+      background: rgba(72, 187, 120, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+    /* Waveform Canvas */
+    /* Waveform Visualization */
+    .waveform-container {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 15px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .waveform-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .time-markers {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+    canvas#waveform {
+      width: 100%;
+      height: 120px;
+      background: var(--background);
+      border-radius: var(--radius-sm);
+    }
+    /* #waveform {
+      background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+    .waveform-controls {
+      margin-top: 15px;
+      text-align: center;
+    } */
+    /* Real-time Log */
+    /* Analysis Section */
+    .analysis-section {
+      color: var(--text-primary);
+    }
+
+    .analysis-section h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    .real-time-log {
+      background-color: #f7fcff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      color: #333;
+      padding: 15px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .real-time-log p {
+      margin-bottom: 8px;
+    }
+    .real-time-log::-webkit-scrollbar {
+      width: 6px;
+    }
+    .real-time-log::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+    #stats {
+      background: var(--background);
+      border-radius: var(--radius-md);
+      padding: 15px;
+      font-size: 0.9rem;
+    }
+    /* Form and Buttons */
+    .audio-form {
+      margin-top: 20px;
+    }
+
+    /* Radar Chart Button */
+    /* .radar-btn {
+      background: linear-gradient(135deg, #1976d2, #1565c0);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 15px;
+    }
+    .radar-btn:hover {
+      background: linear-gradient(135deg, #1565c0, #0d47a1);
+      transform: translateY(-2px);
+    } */
+
+    /* Container for Radar Chart */
+    .radar-container {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    /* Tambahkan untuk konsistensi warna */
+    .radar-container .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .radar-container .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .radar-container .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    /* Radar Chart Canvas */
+    .radar-area canvas {
+      max-width: 500px;
+      max-height: 400px;
+      margin: 0 auto;
+    }
+
+    .radar-area {
+      display: none; 
+      position: relative;
+      min-height: 400px;
+      padding: 20px 0;
+    }
+
+    #emotionRadarChart {
+      display: block;
+      margin: 0 auto;
+      max-width: 100% !important;
+      max-height: 400px !important;
+    }
+    /* Radar Chart */
+    /* .radar-area {
+      margin-top: 20px;
+    }
+
+    canvas#emotionRadarChart {
+      width: 100% !important;
+      height: auto !important;
+    } */
+    /* Responsive design untuk mobile */
+    @media screen and (max-width: 768px) {
+      .radar-area canvas {
+        max-width: 100%;
+        max-height: 300px;
+      }
+      
+      .radar-container {
+        padding: 15px;
+      }
+    }
+
+    /* Loading state untuk radar chart */
+    .radar-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: #666;
+    }
+
+    .radar-loading .spinner {
+      width: 30px;
+      height: 30px;
+      margin-bottom: 10px;
+    }
+
+    /* Audio Preview */
+    #audioPreview {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 8px;
+    }
+    .segment { 
+      background: #f8f9fa; 
+      border-radius: 8px; 
+      padding: 15px; 
+      margin: 12px 0;
+      border-left: 4px solid #007bff;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .happy { color: #28a745; font-weight: bold; }
+    .sad { color: #007bff; font-weight: bold; }
+    .angry { color: #dc3545; font-weight: bold; }
+    .neutral { color: #6c757d; font-weight: bold; }
+    .fear { color: #6f42c1; font-weight: bold; }
+    .calm { color: #20c997; font-weight: bold; }
+    .surprise { color: #fd7e14; font-weight: bold; }
+    .disgust { color: #198754; font-weight: bold; }
+
+    .transcript { 
+      font-size: 1.1em; 
+      background: #e9ecef;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin: 8px 0;
+      display: block;
+      font-style: italic;
+    }
+
+    /* Buttons */
+    .btn {
+      background: var(--surface);
+      color: var(--primary);
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 0 5px;
+    }
+    .btn:hover {
+      background: rgba(255,255,255,0.9);
+      transform: translateY(-2px);
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--surface);
+    }
+
+    .btn-primary:hover {
+      background: #4d7a56;
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: var(--surface);
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+    .radar-btn {
+      background: var(--secondary);
+      color: var(--text-primary);
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 20px 0;
+      width: 100%;
+    }
+    .radar-btn:hover {
+      background: var(--accent);
+      color: var(--surface);
+    }
+    .upload-container {
+      background: rgba(182, 215, 168, 0.1);
+      border: 2px dashed var(--secondary);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-top: 2.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .upload-container:hover {
+      border-color: var(--accent);
+      background: rgba(182, 215, 168, 0.2);
+    }
+
+    .upload-container input[type="file"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    /* .upload-box input[type="file"]:hover {
+      border-color: #74c0fc;
+    }
+
+    .upload-box button {
+      padding: 10px 20px;
+      background-color: #339af0;
+      color: #ffffff;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-box button:hover {
+      background-color: #228be6;
+    }
+
+    .upload-box audio {
+      display: block;
+      margin: 20px auto 0 auto;
+      width: 100%;
+      max-width: 300px;
+    } */
+
+
+    #rec-indicator {
+      color: var(--error);
+      font-weight: bold;
+      margin-left: 10px;
+      display: none;
+    }
+    #rec-indicator.recording {
+      display: inline;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      margin: 15px 0;
+      font-weight: 500;
+    }
+    .status.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+    .status.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+    .status.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+    .status.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+
+    .stats-list {
+      list-style: none;
+      padding: 0;
+    }
+    .stats-list li {
+      padding: 10px;
+      margin: 8px 0;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border-left: 4px solid #007bff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* Loading Indicator */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      border: 4px solid var(--background);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .connection-status {
+      margin-top: 15px;
+      color: #002744;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .connected { background: #d4edda; color: #155724; }
+    .disconnected { background: #f8d7da; color: #721c24; }
+    .real-time-container {
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
+    }
+
+    .segment-counter {
+      display: none !important;
+    }
+
+    @media screen and (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .hero-image {
+        margin-top: 40px;
+      }
+
+      nav {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .main {
+        flex-direction: column;
+        align-items: center;
+        padding: 30px 20px;
+      }
+      
+      .card {
+        max-width: 100%;
+      }
+      
+      .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <!-- <nav>
+    <div class="logo">SERINA</div>
+    <div class="nav-links">
+      <a href="/">HOME</a>
+      <a href="/dashboard">DASHBOARD</a>
+      <a href="/analyze">ANALYZE</a>
+    </div>
+  </nav> -->
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <span class="logo-icon">
+          <img src="/static/images/logo.png" alt="SERINA Logo" />
+        </span>
+        <span class="logo-text">SERINA</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/analyze">Analyze</a>
+        <a href="/aboutus">About Us</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="card-header">
+    <h2 class="card-title">🎙️ Speech Emotion Recognition</h2>
+    <p class="card-description">Analyze emotions in real-time speech or uploaded audio files</p>
+  </div>
+  <div class="main">
+    <div class="segment-counter" id="segmentCounter" hidden>
+      Segments: <span id="segmentCount">0</span>
+    </div>
+    <!-- Recording Card -->
+    <div class="card">
+      <div class="record-section">
+        <div class="record-box">
+          <h3>Live Analysis</h3>
+          <p>Start recording to analyze emotions in real-time</p>
+          <div>
+            <button id="recBtn" class="btn btn-primary" onclick="startRealTimeRec()">🔴 Record</button>
+            <button id="stopBtn" class="btn btn-danger hidden" onclick="stopRealTimeRec()" style="display:none;">⏹ Stop</button>
+            <span id="rec-indicator">● Recording...</span>
+            <!-- <span id="connectionStatus" class="connection-status disconnected">Disconnected</span> -->
+          </div>
+          <div id="status"></div>
+        </div>
+
+        <!-- Waveform Visualization -->
+        <div class="waveform-container">
+          <div class="waveform-header">
+            <span>Waveform Visualization</span>
+            <span id="recordingDuration">0:00 / 0:00</span>
+          </div>
+          
+          <div class="time-markers">
+            <span>0</span>
+            <span>20</span>
+            <span>40</span>
+            <span>60</span>
+            <span>80</span>
+            <span>100</span>
+            <span>120</span>
+          </div>
+          
+          <canvas id="waveform" width="800" height="120"></canvas>
+          
+          <div class="waveform-controls">
+            <!-- Audio player will be inserted here after recording -->
+            <div id="audioPlayerContainer"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Processing audio...</p>
+      </div>
+
+      <div class="upload-container">
+        <h3>Upload Audio File</h3>
+        <input type="file" id="audioInput" accept=".wav, .mp3, .webm" />
+        <audio id="audioPreview" controls style="display:none;"></audio>
+        <button class="btn btn-primary" onclick="uploadAndAnalyze()">📊 Analyze File</button>
+      </div>
+
+    </div>
+    <!-- Analysis Card -->
+    <div class="card">
+      <div class="analysis-section">
+        <h3>🔴 Live Results</h3>
+        <div class="real-time-log" id="live-results">
+          <p style="color: var(--text-secondary); font-style: italic;">Real-time results will appear here...</p>
+        </div>
+        <div id="results"></div>
+
+        <h3>📊 Emotion Statistics</h3>
+        <div id="stats">
+          <div class="emotion-stats">
+            <p class="no-data">No analysis data available. Start recording or upload an audio file to see emotion statistics.</p>
+          </div>
+        </div>
+
+        <!-- Tombol Tampilkan Grafik Emosi -->
+        <button class="btn btn-primary" id="radarBtn">🔍 Radar Graph</button>
+        
+        <div class="radar-container">
+          <!-- (Opsional) Form tersembunyi tetap bisa disimpan untuk kebutuhan lain -->
+          <form class="audio-form hidden" id="audioForm">
+            <input type="hidden" name="audio" id="audioBlobInput" />
+          </form>
+
+          <!-- Area untuk Radar Chart -->
+          <div class="radar-area">
+            <canvas id="emotionRadarChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // Full fixed JavaScript logic for real-time audio emotion prediction, waveform, transcript, audio preview, and emotion stats
+    let ws = null;
+    let isRecording = false;
+    let mediaRecorder=null;
+    let audioContext = null;
+    let processor = null;
+    let input = null;
+    let segmentCount = 0;
+    let currentEmotionStats = {};
+    let analyser = null; //buat gambar wave
+    let source = null;
+    let dataArray = null;
+    let recording = false; 
+    let recognition = null;
+    let stream = null;
+    let audioChunks = [];
+    let animationId;
+    let radarChart = null;
+    let RADAR_DATA = {fear: 0, calm: 0, neutral: 0, angry: 0,
+      happy: 0, surprise: 0, disgust: 0, sad: 0 };
+    let uploadedFile = null;
+
+    const recBtn = document.getElementById("recBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const recInd = document.getElementById("rec-indicator");
+    const liveDiv = document.getElementById("live-results");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const segmentCounter = document.getElementById("segmentCounter");
+    const segmentCountSpan = document.getElementById("segmentCount");
+    const canvas = document.getElementById("waveform");
+    const ctx = canvas.getContext("2d");
+    const audioBlobInput = document.getElementById("audioBlobInput");
+    const audioPlayerContainer = document.getElementById("audioPlayerContainer");
+    const EMOTION_COLORS = {
+      happy: '#28a745',
+      sad: '#007bff', 
+      angry: '#dc3545',
+      neutral: '#6c757d',
+      fear: '#6f42c1',
+      calm: '#20c997',
+      surprise: '#fd7e14',
+      disgust: '#198754'
+    };
+    const audioInput = document.getElementById("audioInput");
+    const audioPreview = document.getElementById("audioPreview");
+
+    audioInput.addEventListener("change", () => {
+      const file = audioInput.files[0];
+      if (!file) return;
+
+      uploadedFile = file;
+      const url = URL.createObjectURL(file);
+      audioPreview.src = url;
+      audioPreview.style.display = "block";
+    });
+
+    async function uploadAndAnalyze() {
+      if (!uploadedFile) {
+        alert("Please select an audio file first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", uploadedFile);
+
+      const response = await fetch("/analyze-audio/", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      displayResults(data);
+    }
+
+    function showStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+    }
+
+    function updateConnectionStatus(connected) {
+      connectionStatus.textContent = connected ? 'Connected' : 'Disconnected';
+      connectionStatus.className = connected ? 'connection-status connected' : 'connection-status disconnected';
+    }
+
+    function updateSegmentCount() {
+      segmentCountSpan.textContent = segmentCount;
+      // segmentCounter.style.display = segmentCount > 0 ? 'block' : 'none';
+    }
+    
+    function displayResults(data) {
+      // const resultDiv = document.getElementById("results");
+      const liveDiv = document.getElementById("live-results");
+      const statsDiv = document.getElementById("stats");
+      const chartCanvas = document.getElementById("radarChart");
+      const segments = data.segments;
+
+      if (data.error || data.message) {
+        liveDiv.innerHTML = `<p>${data.error || data.message}</p>`;
+        return;
+      }
+
+      // Reset data sebelumnya
+      segmentCount = 0;
+      currentEmotionStats = {};
+      // RADAR_DATA = {};
+      let RADAR_DATA = {fear: 0, calm: 0, neutral: 0, angry: 0,
+        happy: 0, surprise: 0, disgust: 0, sad: 0
+      };
+      liveDiv.innerHTML = '';
+
+      segments.forEach((seg, idx) => {
+        segmentCount++;
+        const emo = seg.emotion.toLowerCase();
+        
+        // Update current emotion stats
+        currentEmotionStats[seg.emotion] = (currentEmotionStats[seg.emotion] || 0) + 1;
+
+        // Tampilkan hasil mirip real-time
+        liveDiv.innerHTML += `
+          <div class="segment">
+            <strong>Segment #${segmentCount}</strong> 
+            <small>([${seg.start_time}s - ${seg.end_time}s])</small><br>
+            <div class="transcript ${emo}">"${seg.transcript}"</div>
+            <strong>Emotion:</strong> <span class="${emo}">${seg.emotion.toUpperCase()}</span> 
+            <small>(confidence: ${seg.confidence})</small>
+          </div>
+        `;
+      });
+
+      // Hitung dan tampilkan statistik
+      updateSegmentCount();
+      updateEmotionStats(null);
+      // updateEmotionStats(null); // Perbarui semua dari currentEmotionStats
+
+      chartCanvas.style.display = 'block';
+    }
+
+    function updateEmotionStats(emotion) {
+      if (emotion) {
+        currentEmotionStats[emotion] = (currentEmotionStats[emotion] || 0) + 1;
+      }
+      
+      const statsDiv = document.getElementById('stats');
+      if (Object.keys(currentEmotionStats).length > 0) {
+        let statsHtml = "<ul class='stats-list'>";
+        Object.entries(currentEmotionStats)
+          .sort(([,a], [,b]) => b - a)
+          .forEach(([emo, count]) => {
+            const percentage = ((count / segmentCount) * 100).toFixed(1);
+            statsHtml += `
+              <li>
+                <span class="${emo.toLowerCase()}">${emo.toUpperCase()}</span>
+                <span>${count} segments (${percentage}%)</span>
+              </li>
+            `;
+          });
+        statsHtml += "</ul>";
+        statsDiv.innerHTML = statsHtml;
+        
+        // Auto-update radar chart jika sedang ditampilkan
+        if (radarChart && document.querySelector('.radar-area').style.display === 'block') {
+          updateRadarData();
+          radarChart.data.datasets[0].data = [
+            RADAR_DATA.fear, RADAR_DATA.calm, RADAR_DATA.neutral, RADAR_DATA.angry,
+            RADAR_DATA.happy, RADAR_DATA.surprise, RADAR_DATA.disgust, RADAR_DATA.sad
+          ];
+          radarChart.update('none'); // Update without animation for real-time feel
+        }
+      }
+    }
+
+
+    function connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/ws/audio`;
+      
+      ws = new WebSocket(wsUrl);
+      
+      ws.onopen = function() {
+        console.log('WebSocket connected');
+        updateConnectionStatus(true);
+        showStatus('WebSocket connected - Ready for real-time analysis!', 'success');
+      };
+      
+      ws.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        
+        if (message.type === 'analysis_result') {
+          const result = message.data;
+          segmentCount++;
+          updateSegmentCount();
+          updateEmotionStats(result.emotion);
+          
+          const emo = result.emotion.toLowerCase();
+          liveDiv.innerHTML += `
+            <div class="segment">
+              <strong>Real-time Segment #${segmentCount}</strong> 
+              <small>(duration: ${result.duration.toFixed(2)}s)</small><br>
+              <div class="transcript ${emo}">"${result.transcript}"</div>
+              <strong>Emotion:</strong> <span class="${emo}">${result.emotion.toUpperCase()}</span> 
+              <small>(confidence: ${result.confidence})</small>
+            </div>
+          `;
+          
+          // Auto-scroll to latest result
+          liveDiv.scrollTop = liveDiv.scrollHeight;
+        }
+      };
+      
+      ws.onclose = function() {
+        console.log('WebSocket disconnected');
+        updateConnectionStatus(false);
+        if (isRecording) {
+          showStatus('Connection lost during recording. Please try again.', 'error');
+          stopRealTimeRec();
+        }
+      };
+      
+      ws.onerror = function(error) {
+        console.error('WebSocket error:', error);
+        showStatus('WebSocket connection error', 'error');
+      };
+    }
+
+    async function startRealTimeRec() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        connectWebSocket();
+        await new Promise(resolve => {
+          const checkConnection = () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              resolve();
+            } else {
+              setTimeout(checkConnection, 100);
+            }
+          };
+          checkConnection();
+        });
+      }
+
+      try {
+        // Clear previous UI & state
+        liveDiv.innerHTML = "";
+        document.getElementById('results').innerHTML = '';
+        segmentCount = 0;
+        currentEmotionStats = {};
+        updateSegmentCount();
+        document.getElementById('stats').innerHTML = 'Real-time analysis in progress...';
+        audioChunks = []; // Reset audio chunks
+
+        // Get microphone input with proper constraints
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            sampleRate: 16000,
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+
+        // Setup MediaRecorder untuk audio playback
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = function(event) {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+        mediaRecorder.start(100); // Record in 100ms chunks
+
+        // Setup Web Audio API
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        
+        // Wait for audio context to be running
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+        
+        input = audioContext.createMediaStreamSource(stream);
+        processor = audioContext.createScriptProcessor(4096, 1, 1);
+        analyser = audioContext.createAnalyser();
+
+        // Setup analyser untuk waveform
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.8;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        processor.onaudioprocess = function(e) {
+          if (isRecording && ws && ws.readyState === WebSocket.OPEN) {
+            const inputData = e.inputBuffer.getChannelData(0);
+            const int16Data = new Int16Array(inputData.length);
+            for (let i = 0; i < inputData.length; i++) {
+              int16Data[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+            }
+            const audioData = btoa(String.fromCharCode.apply(null, new Uint8Array(int16Data.buffer)));
+            ws.send(JSON.stringify({ type: 'audio_chunk', data: audioData }));
+          }
+        };
+          
+        // Connect nodes for real-time + visualization
+        input.connect(processor);
+        input.connect(analyser); // Connect input to analyser for waveform
+        processor.connect(audioContext.destination);
+
+        // Get canvas context (pastikan canvas sudah ada di HTML)
+        const canvas = document.getElementById('waveform');
+        if (!canvas) {
+          console.error('Canvas element with id "waveform" not found!');
+          showStatus('Canvas element not found', 'error');
+          return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        
+        // UI update
+        recording = true;
+        isRecording = true;
+        recBtn.style.display = "none";
+        stopBtn.style.display = "inline-block";
+        recInd.classList.add('recording');
+        showStatus('Recording started with waveform.', 'info');
+        
+        // Start waveform visualization dengan delay
+        setTimeout(() => {
+          drawWaveform(canvas, ctx, analyser, dataArray);
+        }, 100);
+        
+      } catch (err) {
+        console.error('Recording error:', err);
+        showStatus('Microphone access denied or unavailable.', 'error');
+      }
+    }
+
+    function stopRealTimeRec() {
+      isRecording = false;
+      recording = false;
+
+      if (recognition) {
+        recognition.stop();
+        recognition.onresult = null;
+        recognition.onerror = null;
+      }
+
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+
+      if (processor) {
+        processor.disconnect();
+        processor = null;
+      }
+      if (input) {
+        input.disconnect();
+        input = null;
+      }
+      if (audioContext && audioContext.state !== 'closed') {
+        audioContext.close();
+        audioContext = null;
+      }
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'stop_recording' }));
+      }
+
+      // Update UI
+      stopBtn.style.display = "none";
+      recBtn.style.display = "inline-block";
+      recInd.classList.remove('recording');
+
+      // create audio playback dan waveform setelah recording selesai
+      setTimeout(() => {
+        if (audioChunks.length > 0) {
+          const blob = new Blob(audioChunks, { type: 'audio/wav' });
+          const audioURL = URL.createObjectURL(blob);
+          const audio = document.createElement('audio');
+          audio.controls = true;
+          audio.src = audioURL;
+          audio.id = 'audioPreview';
+
+          const durationText = document.getElementById('recordingDuration');
+
+          // update total duration 
+          audio.addEventListener('loadedmetadata', () => {
+            if (durationText) {
+              const total = formatTime(audio.duration);
+              durationText.textContent = `0:00 / ${total}`;
+            }
+          });
+
+          // update current time 
+          audio.addEventListener('timeupdate', () => {
+            if (durationText) {
+              const current = formatTime(audio.currentTime);
+              const total = formatTime(audio.duration);
+              durationText.textContent = `${current} / ${total}`;
+            }
+          });
+
+          function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${min}:${sec}`;
+          }
+
+          const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+          if (audioPlayerContainer) {
+            audioPlayerContainer.innerHTML = '<p>🎵 Audio Recording:</p>';
+            audioPlayerContainer.appendChild(audio);
+          }
+
+          // Draw waveform and playback cursor
+          const waveformCanvas = document.getElementById('waveform');
+          if (waveformCanvas) {
+            const ctx = waveformCanvas.getContext('2d');
+            const fileReader = new FileReader();
+
+            fileReader.onload = function () {
+              const arrayBuffer = fileReader.result;
+              const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 44100 * 40, 44100); // max 40s audio
+
+              offlineCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
+                const channelData = decodedBuffer.getChannelData(0);
+                const canvasWidth = waveformCanvas.width;
+                const canvasHeight = waveformCanvas.height;
+                const samplesPerPixel = Math.floor(channelData.length / canvasWidth);
+
+                // Draw static waveform
+                function drawWaveform() {
+                  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                  ctx.fillStyle = '#f8f9fa';
+                  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+                  ctx.strokeStyle = '#28a745';
+                  ctx.beginPath();
+                  for (let i = 0; i < canvasWidth; i++) {
+                    const sampleIndex = i * samplesPerPixel;
+                    const sample = channelData[sampleIndex] || 0;
+                    const y = canvasHeight / 2 + sample * canvasHeight / 2;
+                    if (i === 0) ctx.moveTo(i, y);
+                    else ctx.lineTo(i, y);
+                  }
+                  ctx.stroke();
+                }
+
+                drawWaveform(); // Initial waveform
+
+                // Draw cursor during playback
+                function drawCursor() {
+                  if (!audio.paused && !audio.ended) {
+                    requestAnimationFrame(drawCursor);
+                  }
+
+                  drawWaveform(); // Redraw waveform
+
+                  const posX = (audio.currentTime / decodedBuffer.duration) * canvasWidth;
+                  ctx.strokeStyle = '#dc3545';
+                  ctx.beginPath();
+                  ctx.moveTo(posX, 0);
+                  ctx.lineTo(posX, canvasHeight);
+                  ctx.stroke();
+                }
+
+                audio.addEventListener('play', drawCursor);
+              });
+            };
+
+            fileReader.readAsArrayBuffer(blob);
+          }
+        }
+      }, 500);
+
+      showStatus('Recording stopped', 'success');
+    }
+
+    // radar data
+    function generateEmotionColors() {
+      const colors = [];
+      const backgroundColors = [];
+      
+      Object.keys(RADAR_DATA).forEach(emotion => {
+        const color = EMOTION_COLORS[emotion] || '#6c757d';
+        colors.push(color);
+        // Tambahkan transparency untuk background
+        backgroundColors.push(color + '33'); // 33 = 20% opacity dalam hex
+      });
+      
+      return { borderColors: colors, backgroundColors: backgroundColors };
+    }
+    
+    function updateRadarData() {
+      RADAR_DATA = {fear: 0, calm: 0, neutral: 0, angry: 0, happy: 0, surprise: 0, disgust: 0, sad: 0};
+      
+      if (Object.keys(currentEmotionStats).length === 0) return;
+      
+      const total = segmentCount || 1;
+      Object.keys(currentEmotionStats).forEach(emotion => {
+        const normalizedEmotion = emotion.toLowerCase();
+        if (RADAR_DATA.hasOwnProperty(normalizedEmotion)) {
+          RADAR_DATA[normalizedEmotion] = parseFloat(((currentEmotionStats[emotion] / total) * 100).toFixed(1));
+        }
+      });
+    }
+
+    function createRadarChart() {
+      const canvas = document.getElementById('emotionRadarChart');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      
+      // Destroy existing chart
+      if (radarChart) {
+        radarChart.destroy();
+        radarChart = null;
+      }
+      
+      updateRadarData();
+      
+      // Generate colors based on emotion data
+      const emotionColors = generateEmotionColors();
+      
+      radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Fear', 'Calm', 'Neutral', 'Angry', 'Happy', 'Surprise', 'Disgust', 'Sad'],
+          datasets: [{
+            label: 'Emotion Distribution (%)',
+            data: [RADAR_DATA.fear, RADAR_DATA.calm, RADAR_DATA.neutral, RADAR_DATA.angry,
+              RADAR_DATA.happy, RADAR_DATA.surprise, RADAR_DATA.disgust,RADAR_DATA.sad],
+            // Background dengan gradient atau solid color
+            backgroundColor: function(context) {const chart = context.chart; const {ctx, chartArea} = chart;if (!chartArea) return null;
+              // Create gradient
+              const gradient = ctx.createRadialGradient(
+                chartArea.left + chartArea.width / 2, 
+                chartArea.top + chartArea.height / 2, 
+                0,
+                chartArea.left + chartArea.width / 2, 
+                chartArea.top + chartArea.height / 2, 
+                Math.max(chartArea.width, chartArea.height) / 2
+              );
+              
+              // Add color stops based on dominant emotion
+              const maxEmotion = Object.keys(RADAR_DATA).reduce((a, b) => 
+                RADAR_DATA[a] > RADAR_DATA[b] ? a : b
+              );
+              const dominantColor = EMOTION_COLORS[maxEmotion] || '#6c757d';
+              
+              gradient.addColorStop(0, dominantColor + '10'); // 10% opacity center
+              gradient.addColorStop(1, dominantColor + '30'); // 30% opacity edge
+              
+              return gradient;
+            },
+            
+            // Border menggunakan warna dominan atau multi-color
+            borderColor: function(context) {
+              // Option 1: Single dominant color
+              const maxEmotion = Object.keys(RADAR_DATA).reduce((a, b) => 
+                RADAR_DATA[a] > RADAR_DATA[b] ? a : b
+              );
+              return EMOTION_COLORS[maxEmotion] || '#6c757d';
+            },
+            
+            borderWidth: 3,
+            
+            // Point colors sesuai dengan setiap emosi
+            pointBackgroundColor: [ EMOTION_COLORS.fear,EMOTION_COLORS.calm, EMOTION_COLORS.neutral, EMOTION_COLORS.angry, 
+            EMOTION_COLORS.happy, EMOTION_COLORS.surprise,EMOTION_COLORS.disgust, EMOTION_COLORS.sad ],
+            
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverBackgroundColor: [ EMOTION_COLORS.fear,EMOTION_COLORS.calm, EMOTION_COLORS.neutral, EMOTION_COLORS.angry, 
+            EMOTION_COLORS.happy, EMOTION_COLORS.surprise,EMOTION_COLORS.disgust, EMOTION_COLORS.sad ],
+            
+            pointHoverBorderColor: '#fff',
+            pointHoverRadius: 8,
+            pointHoverBorderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                stepSize: 20,
+                callback: function(value) {
+                  return value + '%';
+                },
+                color: '#666',
+                font: {
+                  size: 11
+                }
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.1)'
+              },
+              angleLines: {
+                color: 'rgba(0, 0, 0, 0.1)'
+              },
+              pointLabels: {
+                color: function(context) {
+                  // Warna label sesuai dengan emosi
+                  const emotionNames = ['fear', 'calm', 'neutral', 'angry', 'happy', 'surprise', 'disgust', 'sad'];
+                  const emotion = emotionNames[context.index];
+                  return EMOTION_COLORS[emotion] || '#333';
+                },
+                font: {
+                  size: 12,
+                  weight: 'bold'
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                padding: 20,
+                font: {
+                  size: 12,
+                  weight: 'bold'
+                },
+                color: '#333'
+              }
+            },
+            title: {
+              display: true,
+              text: 'Real-time Emotion Distribution',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              color: '#333',
+              padding: 20
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const emotionNames = ['Fear', 'Calm', 'Neutral', 'Angry', 'Happy', 'Surprise', 'Disgust', 'Sad'];
+                  const emotion = emotionNames[context.dataIndex];
+                  return `${emotion}: ${context.parsed.r}%`;
+                }
+              }
+            }
+          },
+          elements: {
+            line: {
+              tension: 0.4
+            }
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const radarBtn = document.getElementById('radarBtn');
+      const radarArea = document.querySelector('.radar-area');
+      
+      if (radarBtn && radarArea) {
+        radarBtn.addEventListener('click', function() {
+          if (Object.keys(currentEmotionStats).length === 0) {
+            showStatus('No emotion data available yet. Please record some audio first.', 'warning');
+            return;
+          }
+          
+          if (radarArea.style.display === 'none' || !radarArea.style.display) {
+            radarArea.style.display = 'block';
+            radarArea.innerHTML = '<div class="radar-loading"><div class="spinner"></div><p>Loading chart...</p></div>';
+            
+            setTimeout(() => {
+              radarArea.innerHTML = '<canvas id="emotionRadarChart"></canvas>';
+              createRadarChart();
+            }, 500);
+            
+            this.innerHTML = '🔍 Close Radar Graph';
+          } else {
+            radarArea.style.display = 'none';
+            this.innerHTML = '🔍 Radar Graph';
+            if (radarChart) {
+              radarChart.destroy();
+              radarChart = null;
+            }
+          }
+        });
+      }
+    });    
+
+    function drawWaveform(canvas, ctx, analyser, dataArray) {
+      // Check if all required elements exist
+      if (!recording || !analyser || !dataArray || !canvas || !ctx) {
+        console.log('Waveform drawing stopped - missing elements');
+        return;
+      }
+      
+      requestAnimationFrame(() => drawWaveform(canvas, ctx, analyser, dataArray));
+      
+      // Try both time domain and frequency domain data
+      analyser.getByteTimeDomainData(dataArray);
+      
+      // Alternative: use frequency data if time domain doesn't work
+      const freqData = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(freqData);
+
+      // Clear canvas
+      ctx.fillStyle = '#f8f9fa';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw center line
+      ctx.strokeStyle = '#dee2e6';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
+
+      // Check if we have audio activity
+      const hasAudio = dataArray.some(value => Math.abs(value - 128) > 2);
+      const hasFreqAudio = freqData.some(value => value > 10);
+      
+      if (hasAudio) {
+        // Draw time domain waveform
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#007bff';
+        ctx.beginPath();
+        
+        const sliceWidth = canvas.width * 1.0 / dataArray.length;
+        let x = 0;
+        
+        for (let i = 0; i < dataArray.length; i++) {
+          const v = dataArray[i] / 128.0;
+          const y = v * canvas.height / 2;
+          
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+          
+          x += sliceWidth;
+        }
+        
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+      } 
+
+      // Debug: log audio levels
+      const timeAverage = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      const freqAverage = freqData.reduce((a, b) => a + b) / freqData.length;
+      
+      if (Math.abs(timeAverage - 128) > 1 || freqAverage > 5) {
+        console.log('Time domain:', Math.abs(timeAverage - 128), 'Freq domain:', freqAverage);
+      }
+    }
+
+    window.onload = () => {
+      updateConnectionStatus(false);
+      updateSegmentCount();
+      connectWebSocket();
+    };
+
+    setInterval(() => {
+      if (!ws || ws.readyState === WebSocket.CLOSED) {
+        updateConnectionStatus(false);
+        connectWebSocket();
+      }
+    }, 10000);
+
+
+  </script>
+</body>
+</html>
